@@ -210,7 +210,7 @@ async function startServer() {
                                     </ul>
                                 </div>
                                 <div class="diagram-img-wrapper">
-                                    <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=500&q=80" alt="Arquitectura Cloud e Infraestructura de Red">
+                                    <img src="https://github.com/Davidshrnndz/devops-cloud-project/blob/main/Infraestructura1.jpeg"Arquitectura Cloud e Infraestructura de Red">
                                 </div>
                             </div>
 
@@ -225,7 +225,7 @@ async function startServer() {
                                     </ul>
                                 </div>
                                 <div class="diagram-img-wrapper">
-                                    <img src="https://images.unsplash.com/photo-1618401471353-b98aedd07871?auto=format&fit=crop&w=500&q=80" alt="Diagrama de Flujo Pipeline CI/CD">
+                                    <img src="https://github.com/Davidshrnndz/devops-cloud-project/blob/main/Infraestructura2.jpeg" alt="Diagrama de Flujo Pipeline CI/CD">
                                 </div>
                             </div>
 
