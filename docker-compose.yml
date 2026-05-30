@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  # Servicio de la aplicación Web
+  web:
+    image: ${DOCKER_IMAGE:-my-web-app:latest} # GitHub Actions reemplazará esto automáticamente
+    ports:
+      - "80:3000" # Mapea el puerto 80 externo (HTTP) al 3000 del contenedor
+    depends_on:
+      - db
+    restart: always
+
+  # Servicio de la Base de Datos (Redis)
+  db:
+    image: redis:alpine
+    restart: always
