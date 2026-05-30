@@ -1,6 +1,5 @@
 name: CI/CD Pipeline - DevOps Cloud Project
 
-# El pipeline se ejecutará automáticamente cada vez que se haga un "Push" en la rama main
 on:
   push:
     branches: [ "main" ]
@@ -16,7 +15,7 @@ jobs:
     - name: Inicializar Node.js (Entorno de pruebas)
       uses: actions/setup-node@v3
       with:
-        node-on-version: '18'
+        node-version: '18'
 
     - name: Instalar Dependencias y Simular Pruebas Unitarias
       run: |
@@ -27,7 +26,7 @@ jobs:
 
   # ---- FASE DE DESPLIEGUE CONTINUO (CD) ----
   deploy:
-    needs: build-and-test # Solo se ejecuta si la fase de CI pasa con éxito
+    needs: build-and-test
     runs-on: ubuntu-latest
     steps:
     - name: Clonar el repositorio para el deploy
@@ -36,38 +35,25 @@ jobs:
     - name: Desplegar en la VM de GCP vía SSH
       uses: appleboy/ssh-action@v1.0.3
       with:
-        host: ${{ secrets::SSH_HOST }}
-        username: ${{ colors.username || 'bsujuyh' }} # Usuario de la terminal
+        host: ${{ secrets.SSH_HOST }}
+        username: 'bsujuyh'
         key: ${{ secrets.SSH_KEY }}
         port: 22
         script: |
-          # Crear carpeta del proyecto si no existe en la VM
           mkdir -p ~/app
           cd ~/app
           
-          # Copiar de manera limpia el archivo compose (o crearlo)
-          cat << 'EOF' > docker-compose.yml
-          ${{ github.workspace }}/docker-compose.yml
-          EOF
-          
-          # En lugar de compilar en Docker Hub para ahorrar preciados minutos,
-          # Docker Swarm/Compose compilará localmente de forma ultra veloz en tu VM.
-          cat << 'EOF' > Dockerfile
-          FROM node:18-alpine
-          WORKDIR /usr/src/app
-          RUN npm install express redis
-          COPY app.js .
-          EXPOSE 3000
-          CMD [ "node", "app.js" ]
-          EOF
-
-          cat << 'EOF' > app.js
-          $(cat app.js)
-          EOF
-
-          # Levantar los servicios usando Docker Stack (Swarm) o Docker Compose
-          # Para asegurar compatibilidad rápida en 5 horas, usaremos docker-compose down/up.
+          # Limpiar contenedores viejos si existen
           docker compose down || true
+          
+          # Clonar o actualizar el repositorio directamente en la VM para evitar errores de cat
+          if [ ! -d ".git" ]; then
+            git clone https://github.com/${{ github.repository }}.git .
+          else
+            git pull origin main
+          fi
+          
+          # Levantar los servicios de inmediato
           docker compose up -d --build
           
           echo "🚀 ¡Despliegue completado en Producción!"
