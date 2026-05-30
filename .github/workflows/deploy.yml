@@ -10,12 +10,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Clonar el repositorio
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Inicializar Node.js (Entorno de pruebas)
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
-        node-version: '18'
+        node-version: '20'
 
     - name: Instalar Dependencias y Simular Pruebas Unitarias
       run: |
@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Clonar el repositorio para el deploy
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Desplegar en la VM de GCP vía SSH
       uses: appleboy/ssh-action@v1.0.3
@@ -43,17 +43,16 @@ jobs:
           mkdir -p ~/app
           cd ~/app
           
-          # Limpiar contenedores viejos si existen
-          docker compose down || true
-          
-          # Clonar o actualizar el repositorio directamente en la VM para evitar errores de cat
+          # Si la carpeta no tiene el repositorio Git clonado, lo clona limpio
           if [ ! -d ".git" ]; then
             git clone https://github.com/${{ github.repository }}.git .
           else
+            # Si ya existe, descarga los cambios más recientes
             git pull origin main
           fi
           
-          # Levantar los servicios de inmediato
+          # Levantar la aplicación con Docker Compose de manera limpia
+          docker compose down || true
           docker compose up -d --build
           
           echo "🚀 ¡Despliegue completado en Producción!"
